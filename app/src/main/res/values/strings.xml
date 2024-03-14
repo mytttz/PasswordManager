@@ -1,0 +1,27 @@
+<resources>
+    <string name="app_name">Password Manager</string>
+    <string name="password_manager">Password Manager</string>
+    <string name="welcome">Welcome</string>
+    <string name="enter_masterkey">Enter MasterKey</string>
+    <string name="create_masterkey">Create MasterKey</string>
+    <string name="enter">Enter</string>
+    <string name="save">Save</string>
+    <string name="enter_site">Enter site</string>
+    <string name="enter_login">Enter login</string>
+    <string name="enter_password">Enter password</string>
+    <string name="settings">Settings</string>
+    <string name="edit_master_key">Edit master key</string>
+    <string name="delete_all_data">Delete all data</string>
+    <string name="confirm">Confirm</string>
+    <string name="new_masterkey">New MasterKey</string>
+    <string name="repeat_new_masterkey">Repeat new MasterKey</string>
+    <string name="old_masterkey">Old MasterKey</string>
+    <string name="master_key_reset">Master key reset</string>
+    <string name="wrong_master_key">Wrong Master key</string>
+    <string name="add_note">Add password</string>
+    <string name="edit_note">Edit password</string>
+    <string name="masterkeys_dont_match">"New MasterKeys don't match!"</string>
+    <string name="masterkeys_match">"Old MasterKey and new MaterKey mustn't be the same"</string>
+    <string name="empty_field">"Empty field"</string>
+
+</resources>
