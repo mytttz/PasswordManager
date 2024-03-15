@@ -17,17 +17,17 @@
         android:theme="@style/Theme.MyApp"
         tools:targetApi="31">
         <activity
-            android:name=".MasterKeyEditActivity"
+            android:name=".masterkeyedit.MasterKeyEditActivity"
             android:exported="false" />
         <activity
-            android:name=".CreateOrEditPasswordActivity"
+            android:name=".createoredit.CreateOrEditPasswordActivity"
             android:exported="false" />
         <activity
-            android:name=".PasswordListActivity"
+            android:name=".passwordlist.PasswordListActivity"
             android:exported="false"
             />
         <activity
-            android:name=".WelcomeActivity"
+            android:name=".welcome.WelcomeActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

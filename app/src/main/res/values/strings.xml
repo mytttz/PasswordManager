@@ -23,5 +23,15 @@
     <string name="masterkeys_dont_match">"New MasterKeys don't match!"</string>
     <string name="masterkeys_match">"Old MasterKey and new MaterKey mustn't be the same"</string>
     <string name="empty_field">"Empty field"</string>
+    <string name="nulll">""</string>
+    <string name="deletion_confirmation">Deletion confirmation</string>
+    <string name="are_you_sure_you_want_to_delete_all_data_this_action_is_irreversible">Are you sure you want to delete all data? This action is irreversible</string>
+    <string name="cancel">Cancel</string>
+    <string name="text_copied_to_clipboard">Text copied to clipboard</string>
+    <string name="are_you_sure_you_want_to_reset_the_masterkey">Are you sure you want to reset the MasterKey? This will delete all recorded data and passwords. This action is irreversible</string>
+    <string name="reset_the_masterkey">Reset the MasterKey</string>
+    <string name="fingerprint_not_available">Fingerprint not available</string>
+    <string name="masterkey_not_specified">MasterKey not specified</string>
+    <string name="ok">Ok</string>
 
 </resources>

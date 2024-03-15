@@ -28,4 +28,5 @@ interface PasswordDao {
 
     @Update
     fun updatePassword(password: Password)
+
 }
