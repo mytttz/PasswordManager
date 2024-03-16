@@ -23,7 +23,6 @@ class CreateOrEditPasswordViewModel(passwordItem: Password?, password: String) {
         get() = liveData.value!!
 
     init {
-
         _liveData = MutableLiveData(
             CreateOrEditPasswordActivityState(
                 editSite = CreateOrEditPasswordActivityState.InputFieldState.Initial(
@@ -37,7 +36,7 @@ class CreateOrEditPasswordViewModel(passwordItem: Password?, password: String) {
         )
     }
 
-    fun createPassword(
+    private fun createPassword(
         context: Context,
         editSite: String,
         editLogin: String,
@@ -52,15 +51,11 @@ class CreateOrEditPasswordViewModel(passwordItem: Password?, password: String) {
             AppDatabase.getDatabase(context).passwordDao()
                 .insertPassword(newPass)
         }
-        MyEncryptedSharedPreferences.initialize(
-            context,
-            KeystoreManager.getDecryptedString(context).toString()
-        )
         writeDataAndBack(context, editSite, editLogin, editPassword)
     }
 
 
-    fun editPassword(
+    private fun editPassword(
         context: Context,
         id: Long,
         editSite: String,
@@ -77,14 +72,10 @@ class CreateOrEditPasswordViewModel(passwordItem: Password?, password: String) {
             AppDatabase.getDatabase(context).passwordDao()
                 .updatePassword(editPass)
         }
-        MyEncryptedSharedPreferences.initialize(
-            context,
-            KeystoreManager.getDecryptedString(context).toString()
-        )
         writeDataAndBack(context, editSite, editLogin, editPassword)
     }
 
-    fun writeDataAndBack(
+    private fun writeDataAndBack(
         context: Context,
         editSite: String,
         editLogin: String,
@@ -94,10 +85,11 @@ class CreateOrEditPasswordViewModel(passwordItem: Password?, password: String) {
             context,
             KeystoreManager.getDecryptedString(context).toString()
         )
-        val preferences = MyEncryptedSharedPreferences.getEncryptedSharedPreferences()
+        val encryptedSharedPreferences =
+            MyEncryptedSharedPreferences.getEncryptedSharedPreferences()
 
-        preferences.edit().putString(
-            "${editSite} ${editLogin}".hashCode()
+        encryptedSharedPreferences.edit().putString(
+            "$editSite $editLogin".hashCode()
                 .toString(),
             editPassword
         ).apply()
@@ -117,15 +109,16 @@ class CreateOrEditPasswordViewModel(passwordItem: Password?, password: String) {
             context,
             KeystoreManager.getDecryptedString(context).toString()
         )
-        val preferences = MyEncryptedSharedPreferences.getEncryptedSharedPreferences()
+        val encryptedSharedPreferences =
+            MyEncryptedSharedPreferences.getEncryptedSharedPreferences()
 
         CoroutineScope(Dispatchers.IO).launch {
             AppDatabase.getDatabase(context).passwordDao()
                 .deletePasswordById(id)
         }
-        preferences.edit()
+        encryptedSharedPreferences.edit()
             .remove(
-                "${editSite} ${editLogin}".hashCode().toString()
+                "$editSite $editLogin".hashCode().toString()
             ).apply()
         val intentBack = Intent(context, PasswordListActivity::class.java)
         context.startActivity(intentBack)

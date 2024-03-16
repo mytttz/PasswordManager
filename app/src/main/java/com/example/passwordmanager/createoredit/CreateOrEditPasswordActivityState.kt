@@ -10,5 +10,4 @@ data class CreateOrEditPasswordActivityState(
         data object Error : InputFieldState
         data class Initial(val initialText: String) : InputFieldState
     }
-
 }

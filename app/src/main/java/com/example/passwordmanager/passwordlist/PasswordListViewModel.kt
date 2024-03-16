@@ -10,7 +10,6 @@ import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.recyclerview.widget.RecyclerView
 import com.example.passwordmanager.MyEncryptedSharedPreferences
 import com.example.passwordmanager.R
 import com.example.passwordmanager.createoredit.CreateOrEditPasswordActivity
@@ -24,15 +23,14 @@ import kotlinx.coroutines.withContext
 
 class PasswordListViewModel(
     context: Context
-) : ViewModel(
-
-) {
+) : ViewModel() {
     private val _livedata = MutableLiveData<PasswordListState>(
         PasswordListState.Initial
     )
 
     val liveData: LiveData<PasswordListState>
         get() = _livedata
+
     private val liveDataValue: PasswordListState
         get() = liveData.value!!
 
@@ -65,11 +63,10 @@ class PasswordListViewModel(
                 MaterialAlertDialogBuilder(context)
                     .setTitle(R.string.deletion_confirmation)
                     .setMessage(R.string.are_you_sure_you_want_to_delete_all_data_this_action_is_irreversible)
-                    .setNegativeButton(R.string.cancel) { dialog, which ->
+                    .setNegativeButton(R.string.cancel) { dialog, _ ->
                         dialog.dismiss()
                     }
-                    .setPositiveButton(R.string.delete_all_data) { dialog, which ->
-
+                    .setPositiveButton(R.string.delete_all_data) { _, _ ->
                         CoroutineScope(Dispatchers.IO).launch {
                             AppDatabase.getDatabase(context).passwordDao()
                                 .deleteAllPasswords()
@@ -81,9 +78,9 @@ class PasswordListViewModel(
                                     context,
                                     decryptedMasterKey
                                 )
-                                val preferences =
+                                val encryptedSharedPreferences =
                                     MyEncryptedSharedPreferences.getEncryptedSharedPreferences()
-                                preferences.edit().clear().apply()
+                                encryptedSharedPreferences.edit().clear().apply()
                                 val newState = when (val oldState = liveDataValue) {
                                     is PasswordListState.Initial -> PasswordListState.Content(
                                         emptyList()
@@ -112,11 +109,10 @@ class PasswordListViewModel(
     }
 
     fun add(context: Context) {
-        val intent = Intent(context, CreateOrEditPasswordActivity::class.java)
-        intent.putExtra("invisible", 1)
-        context.startActivity(intent)
+        val intentAdd = Intent(context, CreateOrEditPasswordActivity::class.java)
+        intentAdd.putExtra("invisible", 1)
+        context.startActivity(intentAdd)
     }
-
 
     fun copyPassword(context: Context, item: String) {
         val clipboardManager =
@@ -129,14 +125,9 @@ class PasswordListViewModel(
         ).show()
     }
 
-
-    fun editPassword(context: Context, position: Int) {
-        if (position != RecyclerView.NO_POSITION) {
-            val intent = Intent(context, CreateOrEditPasswordActivity::class.java)
-            intent.putExtra("EXTRA_ID", position)
-            context.startActivity(intent)
-        }
+    fun editPassword(context: Context, id: Long) {
+        val intentEdit = Intent(context, CreateOrEditPasswordActivity::class.java)
+        intentEdit.putExtra("EXTRA_ID", id)
+        context.startActivity(intentEdit)
     }
-
-
 }

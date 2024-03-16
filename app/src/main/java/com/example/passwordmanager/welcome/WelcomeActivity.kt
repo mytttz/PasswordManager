@@ -24,13 +24,13 @@ class WelcomeActivity : AppCompatActivity() {
         resetMasterKey = findViewById(R.id.resetMasterKey)
         masterKeyInputLayout = findViewById(R.id.textFieldLayout)
         fingerprintButton = findViewById(R.id.fingerprintButton)
-
-        val preferences = PreferenceManager.getDefaultSharedPreferences(this)
+        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
 
         val viewModel = WelcomeViewModel(
             biometricManager = BiometricManager.from(this),
-            encryptedSharedPreferencesIsExist = preferences.contains("EncryptedSharedPreferencesIsExist")
+            encryptedSharedPreferencesIsExist = sharedPreferences.contains("EncryptedSharedPreferencesIsExist")
         )
+
         viewModel.liveData.observe(this) { state ->
             when (state.masterKeyInputState) {
                 is WelcomeState.MasterKeyInputState.Default -> {

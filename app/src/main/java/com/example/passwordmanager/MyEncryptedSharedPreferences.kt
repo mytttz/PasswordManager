@@ -26,7 +26,6 @@ object MyEncryptedSharedPreferences {
     fun updateMasterKey(context: Context, newMasterKeyString: String) {
         context.getSharedPreferences("encrypted_prefs_file", Context.MODE_PRIVATE).edit().clear()
             .apply()
-
         initialize(context, newMasterKeyString)
     }
 

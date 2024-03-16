@@ -43,8 +43,8 @@ class WelcomeViewModel(
     fun checkMasterKey(context: Context, masterKey: String) {
         try {
             MyEncryptedSharedPreferences.initialize(context, masterKey)
-            val preferences = PreferenceManager.getDefaultSharedPreferences(context)
-            preferences.edit().putInt("EncryptedSharedPreferencesIsExist", 1).apply()
+            val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
+            sharedPreferences.edit().putInt("EncryptedSharedPreferencesIsExist", 1).apply()
             KeystoreManager.saveEncryptedString(context, masterKey)
             val intent = Intent(context, PasswordListActivity::class.java)
             context.startActivity(intent)
@@ -60,10 +60,10 @@ class WelcomeViewModel(
         MaterialAlertDialogBuilder(context)
             .setTitle(R.string.deletion_confirmation)
             .setMessage(R.string.are_you_sure_you_want_to_reset_the_masterkey)
-            .setNegativeButton(context.getString(R.string.cancel)) { dialog, which ->
+            .setNegativeButton(context.getString(R.string.cancel)) { dialog, _ ->
                 dialog.dismiss()
             }
-            .setPositiveButton(R.string.reset_the_masterkey) { dialog, which ->
+            .setPositiveButton(R.string.reset_the_masterkey) { _, _ ->
                 CoroutineScope(Dispatchers.IO).launch {
                     AppDatabase.getDatabase(context).passwordDao()
                         .deleteAllPasswords()
@@ -78,10 +78,8 @@ class WelcomeViewModel(
                             masterKeyHintRes = R.string.create_masterkey
                         )
                     )
-
             }
             .show()
-
     }
 
     fun fingerPrintAuthentication(activity: FragmentActivity) {
@@ -93,7 +91,7 @@ class WelcomeViewModel(
             if (!liveDataValue.fingerPrintAvailable) {
                 MaterialAlertDialogBuilder(activity)
                     .setTitle(R.string.fingerprint_not_available)
-                    .setPositiveButton(R.string.cancel) { dialog, which ->
+                    .setPositiveButton(R.string.cancel) { dialog, _ ->
                         dialog.dismiss()
                     }
                     .show()
@@ -101,7 +99,7 @@ class WelcomeViewModel(
                 MaterialAlertDialogBuilder(activity)
                     .setTitle(R.string.masterkey_not_specified)
                     .setMessage(R.string.create_masterkey)
-                    .setPositiveButton(R.string.ok) { dialog, which ->
+                    .setPositiveButton(R.string.ok) { dialog, _ ->
                         dialog.dismiss()
                     }
                     .show()
@@ -110,29 +108,26 @@ class WelcomeViewModel(
     }
 
     private fun isFingerprintAvailable(biometricManager: BiometricManager): Boolean {
-        return biometricManager.canAuthenticate() == BiometricManager.BIOMETRIC_SUCCESS
+        val authenticators = BiometricManager.Authenticators.BIOMETRIC_WEAK
+        return biometricManager.canAuthenticate(authenticators) == BiometricManager.BIOMETRIC_SUCCESS
     }
+
 
     private fun authenticateWithFingerprint(activity: FragmentActivity) {
         val biometricPrompt = BiometricPrompt(
             activity,
             Executors.newSingleThreadExecutor(),
             object : BiometricPrompt.AuthenticationCallback() {
-
-
                 override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
                     super.onAuthenticationSucceeded(result)
                     val intent = Intent(activity, PasswordListActivity::class.java)
                     activity.startActivity(intent)
                 }
             })
-
         val promptInfo = BiometricPrompt.PromptInfo.Builder()
-            .setTitle("Authenticate with fingerprint")
-            .setNegativeButtonText("Cancel")
+            .setTitle(activity.getString(R.string.authenticate_with_fingerprint))
+            .setNegativeButtonText(activity.getString(R.string.cancel))
             .build()
-
         biometricPrompt.authenticate(promptInfo)
     }
-
 }

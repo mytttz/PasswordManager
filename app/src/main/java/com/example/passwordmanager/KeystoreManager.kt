@@ -13,7 +13,6 @@ object KeystoreManager {
     private const val TRANSFORMATION = "AES/GCM/NoPadding"
     private const val KEY_ALIAS =
         "583109675FA26D518DAECA5C5DE1CE8643F844C95CF6731E9315DC8E2BA7FC12C1C25C31D8B8D41AA12B91ED1BF5BBD5"
-    private const val IV_SIZE = 12 // 12 байт для IV
 
     fun saveEncryptedString(context: Context, value: String) {
         val keyStore = KeyStore.getInstance(ANDROID_KEYSTORE)
@@ -35,13 +34,10 @@ object KeystoreManager {
 
         val cipher = Cipher.getInstance(TRANSFORMATION)
         cipher.init(Cipher.ENCRYPT_MODE, getSecretKey())
-        val iv = cipher.iv // Получаем IV
+        val iv = cipher.iv
         val encryptedBytes = cipher.doFinal(value.toByteArray())
-
         val encryptedString = Base64.encodeToString(encryptedBytes, Base64.DEFAULT)
         val ivString = Base64.encodeToString(iv, Base64.DEFAULT)
-
-        // Сохраняем зашифрованную строку и IV в SharedPreferences или еще куда-то
         val sharedPreferences =
             context.getSharedPreferences("encrypted_prefs", Context.MODE_PRIVATE)
         sharedPreferences.edit().apply {
@@ -56,7 +52,6 @@ object KeystoreManager {
             context.getSharedPreferences("encrypted_prefs", Context.MODE_PRIVATE)
         val encryptedString = sharedPreferences.getString("encrypted_value", null) ?: return null
         val ivString = sharedPreferences.getString("iv", null) ?: return null
-
         val cipher = Cipher.getInstance(TRANSFORMATION)
         val iv = Base64.decode(ivString, Base64.DEFAULT)
         cipher.init(Cipher.DECRYPT_MODE, getSecretKey(), GCMParameterSpec(128, iv))

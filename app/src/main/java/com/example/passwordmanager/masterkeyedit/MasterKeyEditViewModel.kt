@@ -17,8 +17,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class MasterKeyEditViewModel {
-
-
     private val _livedata =
         MutableLiveData(
             MasterKeyEditState(
@@ -32,7 +30,6 @@ class MasterKeyEditViewModel {
     private val liveDataValue: MasterKeyEditState
         get() = liveData.value!!
 
-
     fun masterKeyEdit(
         context: Context,
         oldMasterKey: String,
@@ -42,44 +39,38 @@ class MasterKeyEditViewModel {
         val decryptedMasterKey = KeystoreManager.getDecryptedString(context).toString()
         val wrongOldMasterKey = decryptedMasterKey != oldMasterKey
         val wrongRepeatNewMasterKey = newMasterKey != againNewMasterKey
-        val isEmptyField =
-            oldMasterKey.isBlank() || newMasterKey.isBlank() || againNewMasterKey.isBlank()
-        var oldMasterKeyState: MasterKeyEditState.MasterKeyInputFieldState =
-            MasterKeyEditState.MasterKeyInputFieldState.Default
-        var newMasterKeyState: MasterKeyEditState.MasterKeyInputFieldState =
-            MasterKeyEditState.MasterKeyInputFieldState.Default
-        var againNewMasterKeyState: MasterKeyEditState.MasterKeyInputFieldState =
-            MasterKeyEditState.MasterKeyInputFieldState.Default
-        val errorMessageResId = when {
-            isEmptyField -> R.string.empty_field
-            wrongOldMasterKey && wrongRepeatNewMasterKey -> -1
-            wrongOldMasterKey -> R.string.wrong_master_key
-            wrongRepeatNewMasterKey -> R.string.masterkeys_dont_match
-            else -> R.string.masterkeys_match
-        }
-        oldMasterKeyState = if (errorMessageResId == R.string.empty_field) {
-            MasterKeyEditState.MasterKeyInputFieldState.Error(R.string.empty_field)
-        } else if (errorMessageResId == -1 || wrongOldMasterKey) {
-            MasterKeyEditState.MasterKeyInputFieldState.Error(R.string.wrong_master_key)
-        } else {
-            MasterKeyEditState.MasterKeyInputFieldState.Default
-        }
+        val matchMasterKeys =
+            decryptedMasterKey == oldMasterKey && newMasterKey == againNewMasterKey && newMasterKey == oldMasterKey
+        val masterkeysDontMatch = wrongOldMasterKey && wrongRepeatNewMasterKey
 
-        newMasterKeyState = if (errorMessageResId == R.string.empty_field) {
-            MasterKeyEditState.MasterKeyInputFieldState.Error(R.string.empty_field)
-        } else if (errorMessageResId == -1 || wrongRepeatNewMasterKey) {
-            MasterKeyEditState.MasterKeyInputFieldState.Error(R.string.masterkeys_dont_match)
-        } else {
-            MasterKeyEditState.MasterKeyInputFieldState.Default
-        }
+        val oldMasterKeyState: MasterKeyEditState.MasterKeyInputFieldState =
+            if (oldMasterKey.isBlank()) {
+                MasterKeyEditState.MasterKeyInputFieldState.Error(R.string.empty_field)
+            } else if (masterkeysDontMatch || wrongOldMasterKey) {
+                MasterKeyEditState.MasterKeyInputFieldState.Error(R.string.wrong_master_key)
+            } else {
+                MasterKeyEditState.MasterKeyInputFieldState.Default
+            }
 
-        againNewMasterKeyState = if (errorMessageResId == R.string.empty_field) {
-            MasterKeyEditState.MasterKeyInputFieldState.Error(R.string.empty_field)
-        } else if (errorMessageResId == -1 || wrongRepeatNewMasterKey) {
-            MasterKeyEditState.MasterKeyInputFieldState.Error(R.string.masterkeys_dont_match)
-        } else {
-            MasterKeyEditState.MasterKeyInputFieldState.Default
-        }
+        val newMasterKeyState: MasterKeyEditState.MasterKeyInputFieldState =
+            if (newMasterKey.isBlank()) {
+                MasterKeyEditState.MasterKeyInputFieldState.Error(R.string.empty_field)
+            } else if (masterkeysDontMatch || wrongRepeatNewMasterKey) {
+                MasterKeyEditState.MasterKeyInputFieldState.Error(R.string.masterkeys_dont_match)
+            } else {
+                MasterKeyEditState.MasterKeyInputFieldState.Default
+            }
+
+        val againNewMasterKeyState: MasterKeyEditState.MasterKeyInputFieldState =
+            if (againNewMasterKey.isBlank()) {
+                MasterKeyEditState.MasterKeyInputFieldState.Error(R.string.empty_field)
+            } else if (masterkeysDontMatch || wrongRepeatNewMasterKey) {
+                MasterKeyEditState.MasterKeyInputFieldState.Error(R.string.masterkeys_dont_match)
+            } else if (matchMasterKeys) {
+                MasterKeyEditState.MasterKeyInputFieldState.Error(R.string.masterkeys_match)
+            } else {
+                MasterKeyEditState.MasterKeyInputFieldState.Default
+            }
 
         _livedata.value = liveDataValue.copy(
             oldMasterKey = oldMasterKeyState,
@@ -87,11 +78,11 @@ class MasterKeyEditViewModel {
             againNewMasterKey = againNewMasterKeyState
         )
 
-        if (!wrongOldMasterKey && !wrongRepeatNewMasterKey) {
+        if (!wrongOldMasterKey && !wrongRepeatNewMasterKey && !matchMasterKeys) {
             var arrayOfPassword: ArrayList<Password>
 
             MyEncryptedSharedPreferences.initialize(context, decryptedMasterKey)
-            var preferences: EncryptedSharedPreferences
+            var encryptedSharedPreferences: EncryptedSharedPreferences
             val arrayOfEncrypt = ArrayList<String>()
             CoroutineScope(Dispatchers.IO).launch {
                 arrayOfPassword =
@@ -101,27 +92,27 @@ class MasterKeyEditViewModel {
                     context,
                     decryptedMasterKey
                 )
-                preferences = MyEncryptedSharedPreferences.getEncryptedSharedPreferences()
+                encryptedSharedPreferences =
+                    MyEncryptedSharedPreferences.getEncryptedSharedPreferences()
                 for (i in arrayOfPassword.indices) {
                     val password = arrayOfPassword[i]
                     arrayOfEncrypt.add(
-                        preferences.getString(
+                        encryptedSharedPreferences.getString(
                             "${password.site} ${password.login}".hashCode().toString(), ""
                         ).toString()
                     )
                 }
 
                 withContext(Dispatchers.Main) {
-                    val MasterKeyNew = newMasterKey
                     MyEncryptedSharedPreferences.updateMasterKey(
                         context,
-                        MasterKeyNew
+                        newMasterKey
                     )
-                    val newPreferences =
+                    val newEncryptedSharedPreferences =
                         MyEncryptedSharedPreferences.getEncryptedSharedPreferences()
                     for (i in arrayOfPassword.indices) {
                         val password = arrayOfPassword[i]
-                        newPreferences.edit().putString(
+                        newEncryptedSharedPreferences.edit().putString(
                             "${password.site} ${password.login}".hashCode().toString(),
                             arrayOfEncrypt[i]
                         ).apply()
@@ -136,8 +127,8 @@ class MasterKeyEditViewModel {
                             newMasterKey = MasterKeyEditState.MasterKeyInputFieldState.Default,
                             againNewMasterKey = MasterKeyEditState.MasterKeyInputFieldState.Default
                         )
-                    val intent = Intent(context, PasswordListActivity::class.java)
-                    context.startActivity(intent)
+                    val intentBack = Intent(context, PasswordListActivity::class.java)
+                    context.startActivity(intentBack)
                 }
             }
         }

@@ -2,7 +2,6 @@ package com.example.passwordmanager.createoredit
 
 import KeystoreManager
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import com.example.passwordmanager.MyEncryptedSharedPreferences
@@ -37,17 +36,20 @@ class CreateOrEditPasswordActivity : AppCompatActivity() {
         editLoginLayout = findViewById(R.id.editLoginLayout)
         editPasswordLayout = findViewById(R.id.editPassLayout)
         deleteButton = findViewById(R.id.deleteButton)
-        val id = intent.getIntExtra("EXTRA_ID", -1).toLong()
-        Log.i("asd", id.toString())
+        toolbar = findViewById(R.id.topAppBar)
+        val id = intent.getLongExtra("EXTRA_ID", -1)
         if (intent.getIntExtra("invisible", 0) == 1) {
             deleteButton.visibility = View.GONE
+        } else {
+            toolbar.title = resources.getString(R.string.edit_note)
         }
         editSite = findViewById(R.id.editSite)
         editLogin = findViewById(R.id.editLogin)
         editPassword = findViewById(R.id.editPass)
-        toolbar = findViewById(R.id.topAppBar)
-        setSupportActionBar(toolbar)
         saveButton = findViewById(R.id.saveButton)
+
+        setSupportActionBar(toolbar)
+
         toolbar.setNavigationOnClickListener {
             finish()
         }
@@ -57,16 +59,16 @@ class CreateOrEditPasswordActivity : AppCompatActivity() {
             val editPassId =
                 AppDatabase.getDatabase(this@CreateOrEditPasswordActivity).passwordDao()
                     .getPasswordById(id)
-            Log.i("asd", editPassId.toString())// Отъебнуло запись в базу дыннх, оно не стирает адекватно
             MyEncryptedSharedPreferences.initialize(
                 this@CreateOrEditPasswordActivity,
                 KeystoreManager.getDecryptedString(this@CreateOrEditPasswordActivity).toString()
             )
-            val preferences = MyEncryptedSharedPreferences.getEncryptedSharedPreferences()
+            val encryptedSharedPreferences =
+                MyEncryptedSharedPreferences.getEncryptedSharedPreferences()
 
             withContext(Dispatchers.Main) {
                 viewModel = CreateOrEditPasswordViewModel(
-                    editPassId, preferences.getString(
+                    editPassId, encryptedSharedPreferences.getString(
                         "${editPassId?.site} ${editPassId?.login}".hashCode().toString(), ""
                     ).toString()
                 )

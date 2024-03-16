@@ -1,4 +1,3 @@
-import android.annotation.SuppressLint
 import android.content.Context
 import android.transition.AutoTransition
 import android.transition.TransitionManager
@@ -7,11 +6,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.example.passwordmanager.MyEncryptedSharedPreferences
 import com.example.passwordmanager.R
 import com.example.passwordmanager.passwordlist.PasswordItemState
 import com.example.passwordmanager.passwordlist.PasswordListViewModel
@@ -29,12 +26,12 @@ class PasswordAdapter(
         val loginTextView: TextView = itemView.findViewById(R.id.loginText)
         val passwordTextView: TextView = itemView.findViewById(R.id.passwordText)
         private val editButton: ImageView = itemView.findViewById(R.id.editButton)
-        val visibilityOfPass: ImageView = itemView.findViewById(R.id.visibilityOfPass)
+        private val visibilityOfPass: ImageView = itemView.findViewById(R.id.visibilityOfPass)
         val siteImg: ImageView = itemView.findViewById(R.id.siteImg)
 
         init {
             editButton.setOnClickListener {
-                viewModel.editPassword(context, getItem(adapterPosition).id.toInt())
+                viewModel.editPassword(context, getItem(adapterPosition).id)
             }
 
             passwordTextView.setOnClickListener {
@@ -55,6 +52,7 @@ class PasswordAdapter(
                     loginTextView.visibility = View.GONE
                     passwordTextView.visibility = View.GONE
                     visibilityOfPass.visibility = View.GONE
+                    visibilityOfPass.setImageResource(R.drawable.visibility_icon)
                     val dots = "•".repeat(passwordTextView.text.length)
                     passwordTextView.text = dots
                 }
@@ -97,7 +95,6 @@ class PasswordAdapter(
             .into(holder.siteImg)
     }
 
-
     override fun submitList(list: List<PasswordItemState>?) {
         val transition = AutoTransition()
         transition.duration = 150
@@ -105,7 +102,6 @@ class PasswordAdapter(
         TransitionManager.beginDelayedTransition(parent, transition)
         super.submitList(list)
     }
-
 
     class PasswordDiffCallback : DiffUtil.ItemCallback<PasswordItemState>() {
         override fun areItemsTheSame(
@@ -122,5 +118,4 @@ class PasswordAdapter(
             return oldItem == newItem
         }
     }
-
 }

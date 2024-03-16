@@ -8,34 +8,31 @@ import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import androidx.security.crypto.EncryptedSharedPreferences
 import com.example.passwordmanager.MyEncryptedSharedPreferences
 import com.example.passwordmanager.R
 import com.example.passwordmanager.database.AppDatabase
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
-
 class PasswordListActivity : AppCompatActivity() {
     private lateinit var passwordListRecycler: RecyclerView
     private lateinit var dbPassword: AppDatabase
     private lateinit var topAppBar: MaterialToolbar
     private lateinit var addButton: FloatingActionButton
-    private lateinit var sharedPreferences: EncryptedSharedPreferences
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val decryptedMasterKey = KeystoreManager.getDecryptedString(this).toString()
-        MyEncryptedSharedPreferences.initialize(this, decryptedMasterKey)
-        sharedPreferences = MyEncryptedSharedPreferences.getEncryptedSharedPreferences()
+        MyEncryptedSharedPreferences.initialize(
+            this,
+            KeystoreManager.getDecryptedString(this).toString()
+        )
         setContentView(R.layout.activity_password_list)
         passwordListRecycler = findViewById(R.id.passwordList)
         topAppBar = findViewById(R.id.topAppBar)
         addButton = findViewById(R.id.addButton)
         dbPassword = AppDatabase.getDatabase(this)
         val rootView = findViewById<ViewGroup>(android.R.id.content)
-        var viewModel = PasswordListViewModel(applicationContext)
+        val viewModel = PasswordListViewModel(applicationContext)
         val adapter =
             PasswordAdapter(
                 this,
@@ -64,15 +61,12 @@ class PasswordListActivity : AppCompatActivity() {
             }
             adapter.submitList(items)
         }
-
         topAppBar.setOnMenuItemClickListener { menuItem ->
             viewModel.menuSelected(this, menuItem)
         }
-
         addButton.setOnClickListener {
             viewModel.add(this)
         }
-
     }
 }
 

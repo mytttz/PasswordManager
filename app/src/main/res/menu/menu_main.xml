@@ -1,8 +1,8 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/deleteAllData"
-        android:title="Delete all data"/>
+        android:title="@string/delete_all_data"/>
     <item
         android:id="@+id/editMasterKey"
-        android:title="Edit MasterKey"/>
+        android:title="@string/edit_master_key"/>
 </menu>
