@@ -1,6 +1,6 @@
 package com.example.passwordmanager.passwordlist
 
-import KeystoreManager
+import com.example.passwordmanager.KeystoreManager
 import PasswordAdapter
 import android.content.res.Resources
 import android.os.Bundle
@@ -57,7 +57,6 @@ class PasswordListActivity : AppCompatActivity() {
             val items = when (state) {
                 is PasswordListState.Initial -> emptyList()
                 is PasswordListState.Content -> state.items
-
             }
             adapter.submitList(items)
         }
@@ -69,4 +68,3 @@ class PasswordListActivity : AppCompatActivity() {
         }
     }
 }
-

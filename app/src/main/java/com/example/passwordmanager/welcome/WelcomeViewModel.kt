@@ -1,6 +1,6 @@
 package com.example.passwordmanager.welcome
 
-import KeystoreManager
+import com.example.passwordmanager.KeystoreManager
 import android.content.Context
 import android.content.Intent
 import androidx.biometric.BiometricManager

@@ -1,13 +1,15 @@
 package com.example.passwordmanager.createoredit
 
-import KeystoreManager
+import com.example.passwordmanager.KeystoreManager
 import android.content.Context
 import android.content.Intent
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.passwordmanager.MyEncryptedSharedPreferences
+import com.example.passwordmanager.R
 import com.example.passwordmanager.database.AppDatabase
 import com.example.passwordmanager.database.Password
+import com.example.passwordmanager.masterkeyedit.MasterKeyEditState
 import com.example.passwordmanager.passwordlist.PasswordListActivity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -131,24 +133,21 @@ class CreateOrEditPasswordViewModel(passwordItem: Password?, password: String) {
         editLogin: String,
         editPassword: String
     ) {
-        var siteState: CreateOrEditPasswordActivityState.InputFieldState =
-            CreateOrEditPasswordActivityState.InputFieldState.Default
-        var loginState: CreateOrEditPasswordActivityState.InputFieldState =
-            CreateOrEditPasswordActivityState.InputFieldState.Default
-        var passwordState: CreateOrEditPasswordActivityState.InputFieldState =
-            CreateOrEditPasswordActivityState.InputFieldState.Default
-
-        if (editSite.isEmpty()) {
-            siteState = CreateOrEditPasswordActivityState.InputFieldState.Error
+        val siteState = when {
+            editSite.isBlank() -> CreateOrEditPasswordActivityState.InputFieldState.Error
+            else -> CreateOrEditPasswordActivityState.InputFieldState.Default
         }
 
-        if (editLogin.isEmpty()) {
-            loginState = CreateOrEditPasswordActivityState.InputFieldState.Error
+        val loginState = when {
+            editLogin.isBlank() -> CreateOrEditPasswordActivityState.InputFieldState.Error
+            else -> CreateOrEditPasswordActivityState.InputFieldState.Default
         }
 
-        if (editPassword.isEmpty()) {
-            passwordState = CreateOrEditPasswordActivityState.InputFieldState.Error
+        val passwordState = when {
+            editPassword.isBlank() -> CreateOrEditPasswordActivityState.InputFieldState.Error
+            else -> CreateOrEditPasswordActivityState.InputFieldState.Default
         }
+
 
         _liveData.value = liveDataValue.copy(
             editSite = siteState,
@@ -156,7 +155,7 @@ class CreateOrEditPasswordViewModel(passwordItem: Password?, password: String) {
             editPassword = passwordState
         )
         val isNotEmpty =
-            editSite.isNotEmpty() && editLogin.isNotEmpty() && editPassword.isNotEmpty()
+            editSite.isNotBlank() && editLogin.isNotBlank() && editPassword.isNotBlank()
         if (isNotEmpty) {
             if (id != -1L) {
                 editPassword(

@@ -1,6 +1,6 @@
 package com.example.passwordmanager.createoredit
 
-import KeystoreManager
+import com.example.passwordmanager.KeystoreManager
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
@@ -84,8 +84,8 @@ class CreateOrEditPasswordActivity : AppCompatActivity() {
             viewModel?.createOrEdit(
                 this,
                 id,
-                editSite.text.toString(),
-                editLogin.text.toString(),
+                editSite.text.toString().trim(),
+                editLogin.text.toString().trim(),
                 editPassword.text.toString()
             )
         }
